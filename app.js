@@ -140,7 +140,7 @@ const days = [
       {
         eventId: "bendicion-bolas",
         time: "18:30",
-        title: "Bendición de bolas",
+        title: "Bendición de bollas",
         icon: "🕯️",
         photo: "images/bendicion-bolas.jpg",
         detail: "Acto tradicional incluido en el programa festivo. Se recomienda acudir con unos minutos de antelación, mantener un ambiente respetuoso y seguir las indicaciones que se den en el lugar de celebración. Los detalles prácticos, punto de encuentro y posible participación se podrán comunicar por los canales de la organización."
