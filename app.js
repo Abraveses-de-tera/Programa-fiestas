@@ -106,7 +106,7 @@ const days = [
       {
         eventId: "grand-prix-braga",
         time: "19:00",
-        title: "I Grand Prix Braga",
+        title: "I Grand Prix Bragao",
         note: "Mayores de 16 años",
         icon: "🏁",
         detail: "Prueba festiva de equipos con retos, habilidad, equilibrio y muchas risas. El Grand Prix está pensado para participantes mayores de 16 años que quieran colaborar con su peña o grupo de amigos. Consulta la normativa, los equipos disponibles y las medidas de seguridad antes de participar."
