@@ -26,9 +26,12 @@
           <p class="section-label">PROGRAMA DE FIESTAS 2027</p>
           <h2 id="agenda-title">¿Qué hay hoy?</h2>
         </div>
-        <button class="today-button" id="todayButton" type="button">
-          Ver todos
-        </button>
+        <div class="agenda-actions">
+          <button class="favorites-button" id="favoritesButton" type="button"></button>
+          <button class="today-button" id="todayButton" type="button">
+            Ver todos
+          </button>
+        </div>
       </div>
 
       <div class="search-bar">
@@ -47,10 +50,10 @@
       <nav class="day-tabs" id="dayTabs" aria-label="Selecciona un día"></nav>
 
       <p class="selected-day" id="selectedDay" aria-live="polite"></p>
-      <p class="agenda-help">Pulsa una actividad para ver su información.</p>
+      <p class="agenda-help">Pulsa una actividad para ver su información. Pulsa la estrella para guardarla en tus planes.</p>
 
       <section class="event-list" id="eventList" aria-live="polite"></section>
-      <p class="no-results" id="noResults" hidden>No hay actividades que coincidan con tu búsqueda o filtro.</p>
+      <p class="no-results" id="noResults" hidden></p>
     </section>
 
     <section class="whatsapp-cta" aria-labelledby="whatsapp-title">

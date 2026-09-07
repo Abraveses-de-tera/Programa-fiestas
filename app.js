@@ -306,11 +306,14 @@ const todayButton = document.querySelector("#todayButton");
 const categoryFilters = document.querySelector("#categoryFilters");
 const searchInput = document.querySelector("#searchInput");
 const noResults = document.querySelector("#noResults");
+const favoritesButton = document.querySelector("#favoritesButton");
 let selectedId = "all";
 let selectedCategory = "all";
 let searchTerm = "";
+let showFavoritesOnly = false;
 
 const STORAGE_KEY = "abravesesAsistencias";
+const FAVORITES_KEY = "abravesesFavoritos";
 let attendCounts = {};
 let authReady = false;
 let authReadyPromise = null;
@@ -325,6 +328,23 @@ function getConfirmed() {
 
 function setConfirmed(map) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+}
+
+function getFavorites() {
+  try {
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function setFavorites(map) {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(map));
+}
+
+function countFavorites() {
+  const favorites = getFavorites();
+  return Object.values(favorites).filter(Boolean).length;
 }
 
 function hasFirebase() {
@@ -380,6 +400,16 @@ function renderCategoryFilters() {
   categoryFilters.innerHTML = all + chips;
 }
 
+function renderFavoritesButton() {
+  const count = countFavorites();
+  favoritesButton.classList.toggle("is-active", showFavoritesOnly);
+  favoritesButton.innerHTML = `
+    <span aria-hidden="true">${showFavoritesOnly ? "⭐" : "☆"}</span>
+    Mis planes
+    ${count > 0 ? `<span class="favorites-count">${count}</span>` : ""}
+  `;
+}
+
 function visualMarkup(event, color) {
   if (event.photo) {
     return `<img class="event-visual-photo" src="${event.photo}" alt="${event.title}" loading="lazy" />`;
@@ -413,6 +443,7 @@ function linkMarkup(event) {
 
 function card(event, color, id) {
   const featuredClass = event.featured ? "event-card--featured" : "";
+  const isFavorite = getFavorites()[event.eventId] === true;
   return `
     <article class="event-card ${featuredClass}" style="--accent: var(--${color})">
       <button class="event-summary" type="button" data-event="${id}" aria-expanded="false" aria-controls="details-${id}">
@@ -422,6 +453,9 @@ function card(event, color, id) {
           ${event.description ? `<p>${event.description}</p>` : ""}
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
         </span>
+        <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
+          ${isFavorite ? "⭐" : "☆"}
+        </button>
         <span class="event-chevron" aria-hidden="true">＋</span>
       </button>
 
@@ -446,7 +480,8 @@ function matchesFilters(event) {
     event.title.toLowerCase().includes(term) ||
     (event.description || "").toLowerCase().includes(term) ||
     (event.detail || "").toLowerCase().includes(term);
-  return categoryOk && searchOk;
+  const favoriteOk = !showFavoritesOnly || getFavorites()[event.eventId] === true;
+  return categoryOk && searchOk && favoriteOk;
 }
 
 function renderEvents() {
@@ -455,7 +490,9 @@ function renderEvents() {
 
   selectedDay.textContent = selected
     ? selected.label
-    : "Todos los eventos · del 24 al 30 de agosto";
+    : showFavoritesOnly
+      ? "Mis planes guardados"
+      : "Todos los eventos · del 24 al 30 de agosto";
 
   let totalVisible = 0;
   const html = visible.map((day) => {
@@ -469,6 +506,11 @@ function renderEvents() {
   }).join("");
 
   eventList.innerHTML = html;
+  if (totalVisible === 0 && showFavoritesOnly) {
+    noResults.textContent = "Aún no has guardado ninguna actividad. Pulsa la estrella ☆ de cualquier ficha para añadirla a tus planes.";
+  } else {
+    noResults.textContent = "No hay actividades que coincidan con tu búsqueda o filtro.";
+  }
   noResults.hidden = totalVisible > 0;
 }
 
@@ -497,12 +539,38 @@ categoryFilters.addEventListener("click", (event) => {
   renderEvents();
 });
 
+favoritesButton.addEventListener("click", () => {
+  showFavoritesOnly = !showFavoritesOnly;
+  renderFavoritesButton();
+  renderEvents();
+});
+
 searchInput.addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderEvents();
 });
 
 eventList.addEventListener("click", (event) => {
+  const favoriteButton = event.target.closest("[data-favorite]");
+  if (favoriteButton) {
+    event.stopPropagation();
+    const eventId = favoriteButton.dataset.favorite;
+    const favorites = getFavorites();
+    favorites[eventId] = !favorites[eventId];
+    setFavorites(favorites);
+    renderFavoritesButton();
+    if (showFavoritesOnly) {
+      renderEvents();
+    } else {
+      const isFavorite = favorites[eventId] === true;
+      favoriteButton.classList.toggle("is-favorite", isFavorite);
+      favoriteButton.textContent = isFavorite ? "⭐" : "☆";
+      favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+      favoriteButton.setAttribute("aria-label", isFavorite ? "Quitar de mis planes" : "Añadir a mis planes");
+    }
+    return;
+  }
+
   const chevronButton = event.target.closest("[data-event]");
   if (chevronButton) {
     const card = chevronButton.closest(".event-card");
@@ -559,6 +627,7 @@ function listenAttendanceCounts() {
 
 renderTabs();
 renderCategoryFilters();
+renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
