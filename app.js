@@ -329,6 +329,7 @@ function listenAttendanceCounts() {
   });
 }
 
+renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
