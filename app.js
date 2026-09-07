@@ -129,23 +129,25 @@ function linkMarkup(event) {
   return `<a class="event-link" href="${event.link.url}" target="_blank" rel="noopener noreferrer"><span class="event-link-icon">🔗</span>${event.link.label}<span class="event-link-arrow">→</span></a>`;
 }
 
-function card(event, color, isFeatured) {
-  const favorites = getFavorites();
-  const isFavorite = favorites[event.eventId] === true;
+function card(event, color, id) {
+  const featuredClass = event.featured ? "event-card--featured" : "";
+  const isFavorite = getFavorites()[event.eventId] === true;
   return `
-    <article class="event-card${isFeatured ? " event-card--featured" : ""}" style="--accent: var(--${color})" data-event-id="${event.eventId}">
-      <div class="event-summary">
-        <div class="event-time">${event.time}</div>
-        <div class="event-heading">
+    <article class="event-card ${featuredClass}" style="--accent: var(--${color})">
+      <div class="event-summary" role="button" tabindex="0" data-event="${id}" aria-expanded="false" aria-controls="details-${id}">
+        <time class="event-time">${event.time}</time>
+        <span class="event-heading">
           <h3>${event.title}</h3>
           ${event.description ? `<p>${event.description}</p>` : ""}
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
-        </div>
-        <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">${isFavorite ? "❤️" : "🤍"}</button>
-        <button class="event-chevron" type="button" data-event="${event.eventId}" aria-expanded="false" aria-label="Ver información">﹢</button>
+        </span>
+        <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
+          ${isFavorite ? "❤️" : "🤍"}
+        </button>
+        <span class="event-chevron" aria-hidden="true">﹢</span>
       </div>
 
-      <div class="event-details">
+      <div class="event-details" id="details-${id}">
         <div class="event-details-inner">
           ${visualMarkup(event, color)}
           <div class="event-description">
@@ -160,82 +162,81 @@ function card(event, color, isFeatured) {
 }
 
 function matchesFilters(event) {
+  const categoryOk = selectedCategory === "all" || event.category === selectedCategory;
+  const term = searchTerm.trim().toLowerCase();
+  const searchOk = term === "" ||
+    event.title.toLowerCase().includes(term) ||
+    (event.description || "").toLowerCase().includes(term) ||
+    (event.detail || "").toLowerCase().includes(term);
   const favorites = getFavorites();
-  if (selectedId !== "all" && !days.find((d) => d.id === selectedId)?.events.includes(event)) return false;
-  if (selectedCategory !== "all" && event.category !== selectedCategory) return false;
-  if (showFavoritesOnly && favorites[event.eventId] !== true) return false;
-  if (searchTerm.trim()) {
-    const term = searchTerm.trim().toLowerCase();
-    const haystack = `${event.title} ${event.description || ""} ${event.detail || ""}`.toLowerCase();
-    if (!haystack.includes(term)) return false;
-  }
-  return true;
+  const favoriteOk = !showFavoritesOnly || favorites[event.eventId] === true;
+  return categoryOk && searchOk && favoriteOk;
 }
 
 function renderEvents() {
-  const filteredDays = days
-    .map((day) => ({ ...day, events: day.events.filter((event) => (selectedId === "all" || day.id === selectedId) && matchesFilters(event)) }))
-    .filter((day) => day.events.length > 0);
+  const selected = days.find((day) => day.id === selectedId);
+  const visible = selected ? [selected] : days;
 
-  let html = "";
+  selectedDay.textContent = selected
+    ? selected.label
+    : showFavoritesOnly
+      ? "Mis planes guardados"
+      : "Todos los eventos · del 24 al 30 de agosto";
+
   let totalVisible = 0;
-  filteredDays.forEach((day) => {
-    html += `<h3 class="day-group-title">${day.label}</h3>`;
-    day.events.forEach((event) => {
-      totalVisible += 1;
-      html += card(event, day.color, event.featured === true);
-    });
-  });
+  const html = visible.map((day) => {
+    const filteredEvents = day.events.filter(matchesFilters);
+    totalVisible += filteredEvents.length;
+    if (filteredEvents.length === 0) return "";
+    return `
+      ${selected ? "" : `<h3 class="day-group-title">${day.label}</h3>`}
+      ${filteredEvents.map((event, index) => card(event, day.color, `${day.id}-${index}`)).join("")}
+    `;
+  }).join("");
+
   eventList.innerHTML = html;
-
-  if (totalVisible === 0 && showFavoritesOnly) {
-    noResults.textContent = "Aún no has guardado ninguna actividad. Pulsa el corazón 🤍 de cualquier ficha para añadirla a tus planes.";
-  } else {
-    noResults.textContent = "No hay actividades que coincidan con tu búsqueda o filtro.";
-  }
   noResults.hidden = totalVisible > 0;
+  if (totalVisible === 0) {
+    noResults.textContent = showFavoritesOnly
+      ? "Aún no has guardado ninguna actividad. Pulsa el corazón 🤍 de cualquier ficha para añadirla a tus planes."
+      : "No hay actividades que coincidan con la búsqueda.";
+  }
 }
 
-function selectDay(dayId) {
-  selectedId = dayId;
-  dayTabs.querySelectorAll(".day-tab").forEach((tab) => tab.classList.toggle("is-active", tab.dataset.dayId === dayId));
-  if (dayId === "all") {
-    selectedDay.textContent = "Mostrando todas las actividades del programa.";
-  } else {
-    const day = days.find((d) => d.id === dayId);
-    selectedDay.textContent = day ? day.label : "";
-  }
-  renderEvents();
-  document.querySelector(`[data-day-id="${dayId}"]`)?.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-}
+renderTabs();
 
 dayTabs.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-day]");
-  if (button) selectDay(button.dataset.day);
+  const tab = event.target.closest("[data-day-id]");
+  if (!tab) return;
+  dayTabs.querySelectorAll(".day-tab").forEach((t) => t.classList.toggle("is-active", t === tab));
+  selectedId = tab.dataset.dayId;
+  renderEvents();
 });
 
-todayButton.addEventListener("click", () => selectDay("all"));
+todayButton.addEventListener("click", () => {
+  selectedId = "all";
+  dayTabs.querySelectorAll(".day-tab").forEach((t) => t.classList.toggle("is-active", t.dataset.dayId === "all"));
+  renderEvents();
+});
+
+renderCategoryFilters();
 
 categoryFilters.addEventListener("click", (event) => {
   const chip = event.target.closest("[data-category]");
   if (!chip) return;
   categoryFilters.querySelectorAll(".category-chip").forEach((c) => c.classList.toggle("is-active", c === chip));
   selectedCategory = chip.dataset.category;
-  renderCategoryFilters();
+  renderEvents();
+});
+
+searchInput.addEventListener("input", (event) => {
+  searchTerm = event.target.value;
   renderEvents();
 });
 
 favoritesButton.addEventListener("click", () => {
   showFavoritesOnly = !showFavoritesOnly;
   renderFavoritesButton();
-  renderEvents();
-});
-
-searchInput.addEventListener("input", (event) => {
-  searchTerm = event.target.value;
   renderEvents();
 });
 
@@ -271,6 +272,17 @@ eventList.addEventListener("click", (event) => {
   const attendButton = event.target.closest("[data-attend]");
   if (attendButton) {
     toggleAttendance(attendButton.dataset.attend, attendButton);
+  }
+});
+
+eventList.addEventListener("keydown", (event) => {
+  const summary = event.target.closest("[data-event]");
+  if (!summary) return;
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    const card = summary.closest(".event-card");
+    const open = card.classList.toggle("is-open");
+    summary.setAttribute("aria-expanded", String(open));
   }
 });
 
@@ -317,9 +329,6 @@ function listenAttendanceCounts() {
   });
 }
 
-renderTabs();
-renderCategoryFilters();
-renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
