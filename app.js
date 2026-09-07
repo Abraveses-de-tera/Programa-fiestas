@@ -117,9 +117,9 @@ function attendMarkup(event) {
   return `
     <div class="attend-row">
       <button class="attend-button ${confirmed ? "is-going" : ""}" type="button" data-attend="${event.eventId}">
-        ${confirmed ? "✓ Asistiré" : "Asistiré"}
+        ${confirmed ? "Ya voy ✓" : "Asistir"}
       </button>
-      ${count > 0 ? `<span class="attend-count">${count} ${count === 1 ? "persona" : "personas"} van</span>` : ""}
+      <span class="attend-count" data-attend-count="${event.eventId}">${count} ${count === 1 ? "persona va" : "personas van"}</span>
     </div>
   `;
 }
@@ -129,23 +129,21 @@ function linkMarkup(event) {
   return `<a class="event-link" href="${event.link.url}" target="_blank" rel="noopener noreferrer"><span class="event-link-icon">🔗</span>${event.link.label}<span class="event-link-arrow">→</span></a>`;
 }
 
-function eventCardMarkup(event, color, isFeatured) {
+function card(event, color, isFeatured) {
   const favorites = getFavorites();
   const isFavorite = favorites[event.eventId] === true;
   return `
     <article class="event-card${isFeatured ? " event-card--featured" : ""}" style="--accent: var(--${color})" data-event-id="${event.eventId}">
-      <button class="event-summary" type="button" data-event-toggle="${event.eventId}">
+      <div class="event-summary">
         <div class="event-time">${event.time}</div>
         <div class="event-heading">
           <h3>${event.title}</h3>
           ${event.description ? `<p>${event.description}</p>` : ""}
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
         </div>
-        <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
-          ${isFavorite ? "❤️" : "🤍"}
-        </button>
-        <span class="event-chevron" aria-hidden="true">＋</span>
-      </button>
+        <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">${isFavorite ? "❤️" : "🤍"}</button>
+        <button class="event-chevron" type="button" data-event="${event.eventId}" aria-expanded="false" aria-label="Ver información">﹢</button>
+      </div>
 
       <div class="event-details">
         <div class="event-details-inner">
@@ -161,163 +159,167 @@ function eventCardMarkup(event, color, isFeatured) {
   `;
 }
 
-function getFilteredEvents() {
+function matchesFilters(event) {
   const favorites = getFavorites();
-  const term = searchTerm.trim().toLowerCase();
-  return days
-    .map((day) => ({
-      ...day,
-      events: day.events.filter((event) => {
-        if (selectedId !== "all" && day.id !== selectedId) return false;
-        if (selectedCategory !== "all" && event.category !== selectedCategory) return false;
-        if (showFavoritesOnly && favorites[event.eventId] !== true) return false;
-        if (term) {
-          const haystack = `${event.title} ${event.description || ""} ${event.detail || ""}`.toLowerCase();
-          if (!haystack.includes(term)) return false;
-        }
-        return true;
-      })
-    }))
-    .filter((day) => day.events.length > 0);
+  if (selectedId !== "all" && !days.find((d) => d.id === selectedId)?.events.includes(event)) return false;
+  if (selectedCategory !== "all" && event.category !== selectedCategory) return false;
+  if (showFavoritesOnly && favorites[event.eventId] !== true) return false;
+  if (searchTerm.trim()) {
+    const term = searchTerm.trim().toLowerCase();
+    const haystack = `${event.title} ${event.description || ""} ${event.detail || ""}`.toLowerCase();
+    if (!haystack.includes(term)) return false;
+  }
+  return true;
 }
 
-function render() {
-  renderFavoritesButton();
-  const filteredDays = getFilteredEvents();
+function renderEvents() {
+  const filteredDays = days
+    .map((day) => ({ ...day, events: day.events.filter((event) => (selectedId === "all" || day.id === selectedId) && matchesFilters(event)) }))
+    .filter((day) => day.events.length > 0);
+
   let html = "";
   let totalVisible = 0;
   filteredDays.forEach((day) => {
     html += `<h3 class="day-group-title">${day.label}</h3>`;
     day.events.forEach((event) => {
       totalVisible += 1;
-      html += eventCardMarkup(event, day.color, event.featured === true);
+      html += card(event, day.color, event.featured === true);
     });
   });
   eventList.innerHTML = html;
+
   if (totalVisible === 0 && showFavoritesOnly) {
     noResults.textContent = "Aún no has guardado ninguna actividad. Pulsa el corazón 🤍 de cualquier ficha para añadirla a tus planes.";
   } else {
     noResults.textContent = "No hay actividades que coincidan con tu búsqueda o filtro.";
   }
   noResults.hidden = totalVisible > 0;
+}
 
-  document.querySelectorAll("[data-event-toggle]").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const card = button.closest(".event-card");
-      card.classList.toggle("is-open");
-    });
+function selectDay(dayId) {
+  selectedId = dayId;
+  dayTabs.querySelectorAll(".day-tab").forEach((tab) => tab.classList.toggle("is-active", tab.dataset.dayId === dayId));
+  if (dayId === "all") {
+    selectedDay.textContent = "Mostrando todas las actividades del programa.";
+  } else {
+    const day = days.find((d) => d.id === dayId);
+    selectedDay.textContent = day ? day.label : "";
+  }
+  renderEvents();
+  document.querySelector(`[data-day-id="${dayId}"]`)?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
   });
+}
 
-  document.querySelectorAll("[data-favorite]").forEach((favoriteButton) => {
-    favoriteButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const eventId = favoriteButton.dataset.favorite;
-      const favorites = getFavorites();
-      favorites[eventId] = favorites[eventId] !== true;
-      setFavorites(favorites);
+dayTabs.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-day]");
+  if (button) selectDay(button.dataset.day);
+});
+
+todayButton.addEventListener("click", () => selectDay("all"));
+
+categoryFilters.addEventListener("click", (event) => {
+  const chip = event.target.closest("[data-category]");
+  if (!chip) return;
+  categoryFilters.querySelectorAll(".category-chip").forEach((c) => c.classList.toggle("is-active", c === chip));
+  selectedCategory = chip.dataset.category;
+  renderCategoryFilters();
+  renderEvents();
+});
+
+favoritesButton.addEventListener("click", () => {
+  showFavoritesOnly = !showFavoritesOnly;
+  renderFavoritesButton();
+  renderEvents();
+});
+
+searchInput.addEventListener("input", (event) => {
+  searchTerm = event.target.value;
+  renderEvents();
+});
+
+eventList.addEventListener("click", (event) => {
+  const favoriteButton = event.target.closest("[data-favorite]");
+  if (favoriteButton) {
+    event.stopPropagation();
+    const eventId = favoriteButton.dataset.favorite;
+    const favorites = getFavorites();
+    favorites[eventId] = !favorites[eventId];
+    setFavorites(favorites);
+    renderFavoritesButton();
+    if (showFavoritesOnly) {
+      renderEvents();
+    } else {
       const isFavorite = favorites[eventId] === true;
       favoriteButton.classList.toggle("is-favorite", isFavorite);
       favoriteButton.textContent = isFavorite ? "❤️" : "🤍";
       favoriteButton.setAttribute("aria-pressed", String(isFavorite));
       favoriteButton.setAttribute("aria-label", isFavorite ? "Quitar de mis planes" : "Añadir a mis planes");
-      renderFavoritesButton();
-      if (showFavoritesOnly) render();
-    });
-  });
-
-  document.querySelectorAll("[data-attend]").forEach((attendButton) => {
-    attendButton.addEventListener("click", async (event) => {
-      event.stopPropagation();
-      const eventId = attendButton.dataset.attend;
-      const confirmedMap = getConfirmed();
-      const nowConfirmed = confirmedMap[eventId] !== true;
-      confirmedMap[eventId] = nowConfirmed;
-      setConfirmed(confirmedMap);
-      attendButton.classList.toggle("is-going", nowConfirmed);
-      attendButton.textContent = nowConfirmed ? "✓ Asistiré" : "Asistiré";
-      if (hasFirebase()) {
-        try {
-          await ensureAuth();
-          const db = firebase.database();
-          const ref = db.ref(`attendance/${eventId}`);
-          if (nowConfirmed) {
-            await ref.child(firebase.auth().currentUser.uid).set(true);
-          } else {
-            await ref.child(firebase.auth().currentUser.uid).remove();
-          }
-        } catch (error) {
-          console.error("No se pudo sincronizar la asistencia.", error);
-        }
-      }
-    });
-  });
-}
-
-function updateSelectedDayLabel() {
-  if (selectedId === "all") {
-    selectedDay.textContent = "Mostrando todas las actividades del programa.";
+    }
     return;
   }
-  const day = days.find((d) => d.id === selectedId);
-  selectedDay.textContent = day ? day.label : "";
-}
 
-function init() {
-  renderTabs();
-  renderCategoryFilters();
-  render();
-  updateSelectedDayLabel();
-
-  dayTabs.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-day-id]");
-    if (!button) return;
-    dayTabs.querySelectorAll(".day-tab").forEach((tab) => tab.classList.remove("is-active"));
-    button.classList.add("is-active");
-    selectedId = button.dataset.dayId;
-    updateSelectedDayLabel();
-    render();
-  });
-
-  categoryFilters.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-category]");
-    if (!button) return;
-    categoryFilters.querySelectorAll(".category-chip").forEach((chip) => chip.classList.remove("is-active"));
-    button.classList.add("is-active");
-    selectedCategory = button.dataset.category;
-    render();
-  });
-
-  searchInput.addEventListener("input", (event) => {
-    searchTerm = event.target.value;
-    render();
-  });
-
-  todayButton.addEventListener("click", () => {
-    selectedId = "all";
-    selectedCategory = "all";
-    searchTerm = "";
-    searchInput.value = "";
-    dayTabs.querySelectorAll(".day-tab").forEach((tab) => tab.classList.remove("is-active"));
-    dayTabs.querySelector('[data-day-id="all"]').classList.add("is-active");
-    categoryFilters.querySelectorAll(".category-chip").forEach((chip) => chip.classList.remove("is-active"));
-    categoryFilters.querySelector('[data-category="all"]').classList.add("is-active");
-    updateSelectedDayLabel();
-    render();
-  });
-
-  favoritesButton.addEventListener("click", () => {
-    showFavoritesOnly = !showFavoritesOnly;
-    render();
-  });
-
-  if (hasFirebase()) {
-    const db = firebase.database();
-    db.ref("attendance").on("value", (snapshot) => {
-      const data = snapshot.val() || {};
-      attendCounts = Object.fromEntries(Object.entries(data).map(([eventId, users]) => [eventId, Object.keys(users || {}).length]));
-      render();
-    });
+  const chevronButton = event.target.closest("[data-event]");
+  if (chevronButton) {
+    const card = chevronButton.closest(".event-card");
+    const open = card.classList.toggle("is-open");
+    chevronButton.setAttribute("aria-expanded", String(open));
+    return;
   }
+
+  const attendButton = event.target.closest("[data-attend]");
+  if (attendButton) {
+    toggleAttendance(attendButton.dataset.attend, attendButton);
+  }
+});
+
+function toggleAttendance(eventId, button) {
+  if (!hasFirebase()) return;
+  button.disabled = true;
+
+  ensureAuth()
+    .then((user) => {
+      const confirmedMap = getConfirmed();
+      const alreadyGoing = confirmedMap[eventId] === true;
+      const ref = firebase.database().ref(`attendance/${eventId}`);
+      const action = alreadyGoing
+        ? ref.child(user.uid).remove()
+        : ref.child(user.uid).set(true);
+
+      return action.then(() => {
+        confirmedMap[eventId] = !alreadyGoing;
+        setConfirmed(confirmedMap);
+        button.classList.toggle("is-going", !alreadyGoing);
+        button.textContent = !alreadyGoing ? "Ya voy ✓" : "Asistir";
+      });
+    })
+    .catch((error) => {
+      console.error("No se pudo actualizar la asistencia.", error);
+    })
+    .finally(() => {
+      button.disabled = false;
+    });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+function listenAttendanceCounts() {
+  if (!hasFirebase()) return;
+  firebase.database().ref("attendance").on("value", (snapshot) => {
+    const data = snapshot.val() || {};
+    attendCounts = Object.fromEntries(
+      Object.entries(data).map(([eventId, users]) => [eventId, Object.keys(users || {}).length])
+    );
+    document.querySelectorAll("[data-attend-count]").forEach((element) => {
+      const eventId = element.dataset.attendCount;
+      const count = attendCounts[eventId] || 0;
+      element.textContent = `${count} ${count === 1 ? "persona va" : "personas van"}`;
+    });
+  });
+}
+
+renderTabs();
+renderCategoryFilters();
+renderFavoritesButton();
+renderEvents();
+listenAttendanceCounts();
+ensureAuth().catch(() => {});
