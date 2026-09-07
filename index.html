@@ -31,12 +31,26 @@
         </button>
       </div>
 
+      <div class="search-bar">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          id="searchInput"
+          class="search-input"
+          placeholder="Buscar una actividad…"
+          aria-label="Buscar una actividad"
+        />
+      </div>
+
+      <div class="category-filters" id="categoryFilters" aria-label="Filtrar por categoría"></div>
+
       <nav class="day-tabs" id="dayTabs" aria-label="Selecciona un día"></nav>
 
       <p class="selected-day" id="selectedDay" aria-live="polite"></p>
       <p class="agenda-help">Pulsa una actividad para ver su información.</p>
 
       <section class="event-list" id="eventList" aria-live="polite"></section>
+      <p class="no-results" id="noResults" hidden>No hay actividades que coincidan con tu búsqueda o filtro.</p>
     </section>
 
     <section class="whatsapp-cta" aria-labelledby="whatsapp-title">

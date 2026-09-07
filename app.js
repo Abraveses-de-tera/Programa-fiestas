@@ -7,6 +7,7 @@ const days = [
     events: [
       {
         eventId: "bailes-regionales",
+        category: "musica",
         time: "20:00",
         title: "Bailes regionales",
         description: "A cargo de Doña Urraca.",
@@ -23,6 +24,7 @@ const days = [
     events: [
       {
         eventId: "ruta-bodegas",
+        category: "gastronomia",
         time: "19:00",
         title: "II Ruta por las bodegas",
         description: "Con la charanga MANÁITA.",
@@ -35,6 +37,7 @@ const days = [
       },
       {
         eventId: "desfile-disfraces",
+        category: "infantil",
         time: "22:30",
         title: "Desfile infantil de disfraces",
         icon: "🎭",
@@ -43,6 +46,7 @@ const days = [
       },
       {
         eventId: "campanadas",
+        category: "tradicion",
         time: "00:00",
         title: "Campanadas inicio fiestas",
         icon: "🔔",
@@ -58,6 +62,7 @@ const days = [
     events: [
       {
         eventId: "marcha-solidaria",
+        category: "deporte",
         time: "18:30",
         title: "Marcha solidaria FUNDAME",
         icon: "🚶",
@@ -68,6 +73,7 @@ const days = [
       },
       {
         eventId: "bingo-miercoles",
+        category: "juegos",
         time: "20:00",
         title: "Bingo",
         icon: "🎱",
@@ -75,6 +81,7 @@ const days = [
       },
       {
         eventId: "cine-aire-libre",
+        category: "ocio",
         time: "21:30",
         title: "Cine al aire libre",
         icon: "🎬",
@@ -82,6 +89,7 @@ const days = [
       },
       {
         eventId: "campeonato-tute",
+        category: "juegos",
         time: "23:30",
         title: "Campeonato de tute",
         note: "Inscripción hasta las 23 h",
@@ -98,6 +106,7 @@ const days = [
     events: [
       {
         eventId: "juegos-infantiles",
+        category: "infantil",
         time: "17:00",
         title: "Juegos infantiles",
         icon: "🪁",
@@ -105,14 +114,16 @@ const days = [
       },
       {
         eventId: "grand-prix-braga",
+        category: "deporte",
         time: "19:00",
-        title: "I Grand Prix Bragao",
+        title: "I Grand Prix Braga",
         note: "Mayores de 16 años",
         icon: "🏁",
         detail: "Prueba festiva de equipos con retos, habilidad, equilibrio y muchas risas. El Grand Prix está pensado para participantes mayores de 16 años que quieran colaborar con su peña o grupo de amigos. Consulta la normativa, los equipos disponibles y las medidas de seguridad antes de participar."
       },
       {
         eventId: "sardinada",
+        category: "gastronomia",
         time: "21:30",
         title: "Sardinada",
         icon: "🐟",
@@ -120,6 +131,7 @@ const days = [
       },
       {
         eventId: "orquesta-media-luna",
+        category: "musica",
         time: "23:30",
         title: "Orquesta MEDIA LUNA",
         description: "Al descanso, Carrera de la sangría; al finalizar, ELECTROGARITO.",
@@ -139,14 +151,16 @@ const days = [
     events: [
       {
         eventId: "bendicion-bolas",
+        category: "tradicion",
         time: "18:30",
-        title: "Bendición de bollas",
+        title: "Bendición de bolas",
         icon: "🕯️",
         photo: "images/bendicion-bolas.jpg",
         detail: "Acto tradicional incluido en el programa festivo. Se recomienda acudir con unos minutos de antelación, mantener un ambiente respetuoso y seguir las indicaciones que se den en el lugar de celebración. Los detalles prácticos, punto de encuentro y posible participación se podrán comunicar por los canales de la organización."
       },
       {
         eventId: "cagada-gallina",
+        category: "juegos",
         time: "21:00",
         title: "Cagada de la gallina",
         icon: "🐔",
@@ -155,6 +169,7 @@ const days = [
       },
       {
         eventId: "electromoon",
+        category: "musica",
         time: "01:00",
         title: "ELECTROMOON",
         icon: "🌙",
@@ -172,6 +187,7 @@ const days = [
     events: [
       {
         eventId: "misa-difuntos",
+        category: "tradicion",
         time: "12:00",
         title: "Misa por los difuntos",
         icon: "⛪",
@@ -179,6 +195,7 @@ const days = [
       },
       {
         eventId: "paella-popular",
+        category: "gastronomia",
         time: "15:00",
         title: "Paella popular",
         icon: "🥘",
@@ -186,6 +203,7 @@ const days = [
       },
       {
         eventId: "edu-mago",
+        category: "infantil",
         time: "16:00",
         title: "Edu el mago",
         icon: "🪄",
@@ -193,6 +211,7 @@ const days = [
       },
       {
         eventId: "parque-acuatico",
+        category: "infantil",
         time: "17:00",
         title: "Parque acuático",
         icon: "💦",
@@ -200,6 +219,7 @@ const days = [
       },
       {
         eventId: "bingo-sabado",
+        category: "juegos",
         time: "19:00",
         title: "Bingo",
         icon: "🎱",
@@ -207,6 +227,7 @@ const days = [
       },
       {
         eventId: "beer-pong",
+        category: "deporte",
         time: "19:30",
         title: "Torneo de Beer Pong",
         icon: "🏓",
@@ -214,6 +235,7 @@ const days = [
       },
       {
         eventId: "syn3rgia",
+        category: "musica",
         time: "01:00",
         title: "Grupo SYN3RGIA",
         description: "En el descanso y al finalizar: ELECTROGARITO con DJ DAMM VALLEY.",
@@ -232,6 +254,7 @@ const days = [
     events: [
       {
         eventId: "romeria-pendones",
+        category: "tradicion",
         time: "13:00",
         title: "Romería de pendones",
         icon: "🚩",
@@ -240,6 +263,7 @@ const days = [
       },
       {
         eventId: "pulpero",
+        category: "gastronomia",
         time: "14:00",
         title: "Pulpero",
         icon: "🐙",
@@ -247,6 +271,7 @@ const days = [
       },
       {
         eventId: "parque-infantil",
+        category: "infantil",
         time: "17:00",
         title: "Parque infantil",
         icon: "🎈",
@@ -254,6 +279,7 @@ const days = [
       },
       {
         eventId: "tardeo-markfeel",
+        category: "musica",
         time: "19:00",
         title: "Tardeo con MARKFEEL",
         icon: "🎧",
@@ -263,11 +289,26 @@ const days = [
   }
 ];
 
+const categoryLabels = {
+  musica: "🎶 Música",
+  gastronomia: "🍽️ Gastronomía",
+  infantil: "🧸 Infantil",
+  tradicion: "🚩 Tradición",
+  deporte: "🏁 Deporte",
+  juegos: "🎲 Juegos",
+  ocio: "🎬 Ocio"
+};
+
 const dayTabs = document.querySelector("#dayTabs");
 const eventList = document.querySelector("#eventList");
 const selectedDay = document.querySelector("#selectedDay");
 const todayButton = document.querySelector("#todayButton");
+const categoryFilters = document.querySelector("#categoryFilters");
+const searchInput = document.querySelector("#searchInput");
+const noResults = document.querySelector("#noResults");
 let selectedId = "all";
+let selectedCategory = "all";
+let searchTerm = "";
 
 const STORAGE_KEY = "abravesesAsistencias";
 let attendCounts = {};
@@ -331,6 +372,14 @@ function renderTabs() {
   dayTabs.innerHTML = all + buttons;
 }
 
+function renderCategoryFilters() {
+  const all = `<button class="category-chip ${selectedCategory === "all" ? "is-active" : ""}" type="button" data-category="all">Todas</button>`;
+  const chips = Object.entries(categoryLabels).map(([key, label]) => `
+    <button class="category-chip ${selectedCategory === key ? "is-active" : ""}" type="button" data-category="${key}">${label}</button>
+  `).join("");
+  categoryFilters.innerHTML = all + chips;
+}
+
 function visualMarkup(event, color) {
   if (event.photo) {
     return `<img class="event-visual-photo" src="${event.photo}" alt="${event.title}" loading="lazy" />`;
@@ -390,6 +439,16 @@ function card(event, color, id) {
   `;
 }
 
+function matchesFilters(event) {
+  const categoryOk = selectedCategory === "all" || event.category === selectedCategory;
+  const term = searchTerm.trim().toLowerCase();
+  const searchOk = term === "" ||
+    event.title.toLowerCase().includes(term) ||
+    (event.description || "").toLowerCase().includes(term) ||
+    (event.detail || "").toLowerCase().includes(term);
+  return categoryOk && searchOk;
+}
+
 function renderEvents() {
   const selected = days.find((day) => day.id === selectedId);
   const visible = selected ? [selected] : days;
@@ -398,10 +457,19 @@ function renderEvents() {
     ? selected.label
     : "Todos los eventos · del 24 al 30 de agosto";
 
-  eventList.innerHTML = visible.map((day) => `
-    ${selected ? "" : `<h3 class="day-group-title">${day.label}</h3>`}
-    ${day.events.map((event, index) => card(event, day.color, `${day.id}-${index}`)).join("")}
-  `).join("");
+  let totalVisible = 0;
+  const html = visible.map((day) => {
+    const filteredEvents = day.events.filter(matchesFilters);
+    totalVisible += filteredEvents.length;
+    if (filteredEvents.length === 0) return "";
+    return `
+      ${selected ? "" : `<h3 class="day-group-title">${day.label}</h3>`}
+      ${filteredEvents.map((event, index) => card(event, day.color, `${day.id}-${index}`)).join("")}
+    `;
+  }).join("");
+
+  eventList.innerHTML = html;
+  noResults.hidden = totalVisible > 0;
 }
 
 function selectDay(id) {
@@ -420,6 +488,19 @@ dayTabs.addEventListener("click", (event) => {
 });
 
 todayButton.addEventListener("click", () => selectDay("all"));
+
+categoryFilters.addEventListener("click", (event) => {
+  const chip = event.target.closest("[data-category]");
+  if (!chip) return;
+  selectedCategory = chip.dataset.category;
+  renderCategoryFilters();
+  renderEvents();
+});
+
+searchInput.addEventListener("input", (event) => {
+  searchTerm = event.target.value;
+  renderEvents();
+});
 
 eventList.addEventListener("click", (event) => {
   const chevronButton = event.target.closest("[data-event]");
@@ -477,6 +558,7 @@ function listenAttendanceCounts() {
 }
 
 renderTabs();
+renderCategoryFilters();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
