@@ -299,6 +299,47 @@ const categoryLabels = {
   ocio: "🎬 Ocio"
 };
 
+const FESTIVAL_MONTH_INDEX = 7;
+const EVENT_DURATION_MINUTES = 120;
+
+function getFestivalYear() {
+  const now = new Date();
+  const candidate = new Date(now.getFullYear(), FESTIVAL_MONTH_INDEX, 30, 23, 59, 59);
+  return now > candidate ? now.getFullYear() + 1 : now.getFullYear();
+}
+
+function getEventStart(day, event) {
+  const year = getFestivalYear();
+  const [hours, minutes] = event.time.split(":").map(Number);
+  const dayNumber = Number(day.id);
+  const dayOffset = hours < 6 ? 1 : 0;
+  return new Date(year, FESTIVAL_MONTH_INDEX, dayNumber + dayOffset, hours, minutes, 0);
+}
+
+function getEventStatus(day, event, now) {
+  const start = getEventStart(day, event);
+  const end = new Date(start.getTime() + EVENT_DURATION_MINUTES * 60000);
+  if (now >= start && now < end) return "live";
+  if (now < start) return "upcoming";
+  return "past";
+}
+
+function findNextEventId(now) {
+  let closest = null;
+  let closestDiff = Infinity;
+  days.forEach((day) => {
+    day.events.forEach((event) => {
+      const start = getEventStart(day, event);
+      const diff = start.getTime() - now.getTime();
+      if (diff >= 0 && diff < closestDiff) {
+        closestDiff = diff;
+        closest = event.eventId;
+      }
+    });
+  });
+  return closest;
+}
+
 const dayTabs = document.querySelector("#dayTabs");
 const eventList = document.querySelector("#eventList");
 const selectedDay = document.querySelector("#selectedDay");
@@ -311,6 +352,7 @@ let selectedId = "all";
 let selectedCategory = "all";
 let searchTerm = "";
 let showFavoritesOnly = false;
+let nextEventId = null;
 
 const STORAGE_KEY = "abravesesAsistencias";
 const FAVORITES_KEY = "abravesesFavoritos";
@@ -441,16 +483,29 @@ function linkMarkup(event) {
   `;
 }
 
-function card(event, color, id) {
+function statusBadgeMarkup(status, event) {
+  if (status === "live") {
+    return `<span class="status-badge status-badge--live"><span class="status-dot" aria-hidden="true"></span>En directo ahora</span>`;
+  }
+  if (status === "upcoming" && event.eventId === nextEventId) {
+    return `<span class="status-badge status-badge--next">⏭️ Siguiente actividad</span>`;
+  }
+  return "";
+}
+
+function card(day, event, color, id, now) {
   const featuredClass = event.featured ? "event-card--featured" : "";
   const isFavorite = getFavorites()[event.eventId] === true;
+  const status = getEventStatus(day, event, now);
+  const liveClass = status === "live" ? "event-card--live" : "";
   return `
-    <article class="event-card ${featuredClass}" style="--accent: var(--${color})">
+    <article class="event-card ${featuredClass} ${liveClass}" style="--accent: var(--${color})">
       <button class="event-summary" type="button" data-event="${id}" aria-expanded="false" aria-controls="details-${id}">
         <time class="event-time">${event.time}</time>
         <span class="event-heading">
           <h3>${event.title}</h3>
           ${event.description ? `<p>${event.description}</p>` : ""}
+          ${statusBadgeMarkup(status, event)}
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
         </span>
         <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
@@ -485,6 +540,8 @@ function matchesFilters(event) {
 }
 
 function renderEvents() {
+  const now = new Date();
+  nextEventId = findNextEventId(now);
   const selected = days.find((day) => day.id === selectedId);
   const visible = selected ? [selected] : days;
 
@@ -501,7 +558,7 @@ function renderEvents() {
     if (filteredEvents.length === 0) return "";
     return `
       ${selected ? "" : `<h3 class="day-group-title">${day.label}</h3>`}
-      ${filteredEvents.map((event, index) => card(event, day.color, `${day.id}-${index}`)).join("")}
+      ${filteredEvents.map((event, index) => card(day, event, day.color, `${day.id}-${index}`, now)).join("")}
     `;
   }).join("");
 
@@ -631,3 +688,4 @@ renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
+setInterval(renderEvents, 60000);
