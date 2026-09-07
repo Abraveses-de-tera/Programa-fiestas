@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Programa de las Fiestas de Abraveses de Tera" />
+  <meta name="theme-color" content="#111827" />
+  <title>Fiestas de Abraveses de Tera</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <p class="eyebrow">DEL 24 AL 30 DE AGOSTO</p>
+      <h1>ABRAVESES</h1>
+      <p class="subtitle">Que estamos de fiesta…</p>
+      <p class="location">Abraveses de Tera · Zamora</p>
+    </header>
+
+    <section class="agenda" aria-labelledby="agenda-title">
+      <div class="agenda-heading">
+        <div>
+          <p class="section-label">PROGRAMA</p>
+          <h2 id="agenda-title">¿Qué hay hoy?</h2>
+        </div>
+        <button class="today-button" id="todayButton" type="button">
+          Ver todos
+        </button>
+      </div>
+
+      <nav class="day-tabs" id="dayTabs" aria-label="Selecciona un día"></nav>
+
+      <p class="selected-day" id="selectedDay" aria-live="polite"></p>
+      <p class="agenda-help">Pulsa una actividad para ver su información.</p>
+
+      <section class="event-list" id="eventList" aria-live="polite"></section>
+    </section>
+
+    <section class="whatsapp-cta" aria-labelledby="whatsapp-title">
+      <div class="whatsapp-cta-icon" aria-hidden="true">💬</div>
+      <h2 id="whatsapp-title">Únete al grupo de WhatsApp del pueblo</h2>
+      <p>Avisos de última hora, cambios de horario y todo lo que se cuece en Abraveses de Tera, directo a tu móvil.</p>
+      <a class="whatsapp-cta-button" href="https://chat.whatsapp.com/CXqb83XIlelApSAwDoLLlZ?s=cl&p=i&mlu=4&ilr=4" target="_blank" rel="noopener noreferrer">
+        <span aria-hidden="true">📲</span>
+        Unirme al grupo
+      </a>
+    </section>
+
+    <footer>
+      <p>Programa de fiestas de Abraveses de Tera.</p>
+      <p class="footer-note">
+        Consulta posibles cambios de última hora en los canales oficiales de
+        la organización.
+      </p>
+    </footer>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyAfRHsZtUFClLt5FXKm4ydjsRQVjRM4M2I",
+      authDomain: "abraveses-de-tera.firebaseapp.com",
+      databaseURL: "https://abraveses-de-tera-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "abraveses-de-tera",
+      storageBucket: "abraveses-de-tera.firebasestorage.app",
+      messagingSenderId: "1010226528549",
+      appId: "1:1010226528549:web:0c74e3c440350f54671acc"
+    });
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
