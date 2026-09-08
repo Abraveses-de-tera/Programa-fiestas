@@ -8,6 +8,10 @@
   <title>Programa de fiestas 2027 Abraveses de Tera</title>
   <link rel="icon" type="image/jpeg" href="images/abraveses.jpg" />
   <link rel="apple-touch-icon" href="images/abraveses.jpg" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Abraveses" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -91,5 +95,14 @@
     });
   </script>
   <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch((error) => {
+          console.error("No se pudo registrar el service worker.", error);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
