@@ -13,6 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Abraveses" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="countdown.css" />
 </head>
 <body>
   <main class="app">
@@ -21,6 +22,7 @@
       <p class="eyebrow">DEL 24 AL 30 DE AGOSTO</p>
       <h1>ABRAVESES</h1>
       <p class="subtitle">Simpatía y buen humor</p>
+      <p class="countdown" id="countdown" aria-live="polite"></p>
       <p class="location">Abraveses de Tera · Zamora</p>
     </header>
 
@@ -95,6 +97,7 @@
     });
   </script>
   <script src="app.js"></script>
+  <script src="countdown.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
