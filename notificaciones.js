@@ -1,134 +1,111 @@
-function hasFirebaseMessaging() {
-  return typeof firebase !== "undefined" && typeof firebase.messaging === "function";
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
+import { getDatabase, ref, set, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-function hasFirebaseApp() {
-  return typeof firebase !== "undefined" && firebase.apps && firebase.apps.length > 0;
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyAfRHsZtUFClLt5FXKm4ydjsRQVjRM4M2I",
+  authDomain: "abraveses-de-tera.firebaseapp.com",
+  databaseURL: "https://abraveses-de-tera-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "abraveses-de-tera",
+  storageBucket: "abraveses-de-tera.firebasestorage.app",
+  messagingSenderId: "1010226528549",
+  appId: "1:1010226528549:web:0c74e3c440350f54671acc",
+  measurementId: "G-H6G81SHL0X"
+};
 
-const NOTIF_SUBSCRIBED_KEY = "abravesesNotificacionesActivas";
+const VAPID_KEY = "BJABj-fS-xgydA16NRrHC33MgfhFDs8CckUe3LMKHVBhln0IPujuApeekMmjxPkOvvDqZLLBjATp2ZFqm6n7WAs";
+const NOTIF_ACTIVE_KEY = "abraveses_notificaciones_activas";
 
-function isSubscribedLocally() {
-  return localStorage.getItem(NOTIF_SUBSCRIBED_KEY) === "true";
-}
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
-function setSubscribedLocally(value) {
-  localStorage.setItem(NOTIF_SUBSCRIBED_KEY, value ? "true" : "false");
-}
-
-function renderNotifButton(button) {
-  if (!button) return;
-  const browserPermission = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
-
-  if (browserPermission === "denied") {
-    button.innerHTML = `<span aria-hidden="true">🔕</span>Notificaciones bloqueadas`;
-    button.classList.remove("is-active");
-    button.disabled = true;
-    button.title = "Has bloqueado los avisos para este sitio. Actívalos desde los ajustes de tu navegador.";
-    return;
-  }
-
-  button.disabled = false;
-  button.title = "";
-  const active = browserPermission === "granted" && isSubscribedLocally();
-  button.classList.toggle("is-active", active);
-  button.innerHTML = active
-    ? `<span aria-hidden="true">✅</span>Avisos activados (pulsa para desactivar)`
-    : `<span aria-hidden="true">🔔</span>Activar avisos`;
-}
-
-async function ensureNotifAuth() {
-  if (!hasFirebaseApp() || typeof firebase.auth !== "function") {
-    throw new Error("Firebase Auth no disponible.");
-  }
-  if (firebase.auth().currentUser) return firebase.auth().currentUser;
+function ensureAuth() {
+  if (auth.currentUser) return Promise.resolve(auth.currentUser);
   return new Promise((resolve, reject) => {
-    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         unsubscribe();
         resolve(user);
       }
     });
-    firebase.auth().signInAnonymously().catch(reject);
+    signInAnonymously(auth).catch(reject);
   });
 }
 
-async function enableNotifications(button) {
-  if (!("Notification" in window)) {
-    alert("Tu navegador no admite notificaciones.");
-    return;
-  }
-
-  let permission = Notification.permission;
-  if (permission === "default") {
-    permission = await Notification.requestPermission();
-  }
-
-  if (permission !== "granted") {
-    setSubscribedLocally(false);
-    renderNotifButton(button);
-    return;
-  }
-
-  setSubscribedLocally(true);
-
-  if (hasFirebaseMessaging()) {
-    try {
-      const messaging = firebase.messaging();
-      const registration = await navigator.serviceWorker.ready;
-      const token = await messaging.getToken({ serviceWorkerRegistration: registration });
-      if (token && hasFirebaseApp() && firebase.database) {
-        const user = await ensureNotifAuth();
-        await firebase.database().ref(`tokens_notificaciones/${user.uid}`).set(token);
-      }
-    } catch (error) {
-      console.error("No se pudo obtener el token de notificaciones.", error);
-    }
-  }
-
-  renderNotifButton(button);
+async function guardarTokenEnBaseDeDatos(token) {
+  const user = await ensureAuth();
+  await set(ref(db, `tokens_notificaciones/${user.uid}`), token);
 }
 
-async function disableNotifications(button) {
-  setSubscribedLocally(false);
+async function eliminarTokenDeBaseDeDatos() {
+  const user = await ensureAuth();
+  await remove(ref(db, `tokens_notificaciones/${user.uid}`));
+}
 
-  if (hasFirebaseMessaging() && hasFirebaseApp() && firebase.database) {
-    try {
-      const user = await ensureNotifAuth();
-      await firebase.database().ref(`tokens_notificaciones/${user.uid}`).remove();
-      const messaging = firebase.messaging();
-      const registration = await navigator.serviceWorker.ready;
-      const token = await messaging.getToken({ serviceWorkerRegistration: registration }).catch(() => null);
-      if (token) {
-        await messaging.deleteToken(token).catch(() => {});
-      }
-    } catch (error) {
-      console.error("No se pudo eliminar la suscripción de notificaciones.", error);
-    }
+export function notificacionesActivas() {
+  return (
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted" &&
+    localStorage.getItem(NOTIF_ACTIVE_KEY) === "1"
+  );
+}
+
+export function permisoBloqueado() {
+  return typeof Notification !== "undefined" && Notification.permission === "denied";
+}
+
+export async function activarNotificaciones() {
+  if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+    console.warn("Este navegador no soporta notificaciones push.");
+    return false;
   }
 
-  renderNotifButton(button);
-}
-
-function initNotificationsButton() {
-  const button = document.querySelector("#btn-notificaciones");
-  if (!button) return;
-
-  renderNotifButton(button);
-
-  button.addEventListener("click", async () => {
-    if (button.disabled) return;
-    button.disabled = true;
-    const browserPermission = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
-    const currentlyActive = browserPermission === "granted" && isSubscribedLocally();
-
-    if (currentlyActive) {
-      await disableNotifications(button);
-    } else {
-      await enableNotifications(button);
+  try {
+    const permiso = await Notification.requestPermission();
+    if (permiso !== "granted") {
+      console.warn("Permiso de notificaciones no concedido.");
+      return false;
     }
-    button.disabled = false;
-  });
+
+    const registration = await navigator.serviceWorker.register("firebase-messaging-sw.js");
+    const messaging = getMessaging(app);
+
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration
+    });
+
+    if (token) {
+      await guardarTokenEnBaseDeDatos(token);
+      localStorage.setItem(NOTIF_ACTIVE_KEY, "1");
+
+      onMessage(messaging, (payload) => {
+        const { title, body } = payload.notification || {};
+        if (title) {
+          registration.showNotification(title, {
+            body: body || "",
+            icon: "images/abraveses.jpg"
+          });
+        }
+      });
+
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error activando notificaciones:", error);
+    return false;
+  }
 }
 
-document.addEventListener("DOMContentLoaded", initNotificationsButton);
+export async function desactivarNotificaciones() {
+  localStorage.setItem(NOTIF_ACTIVE_KEY, "0");
+  try {
+    await eliminarTokenDeBaseDeDatos();
+  } catch (error) {
+    console.error("Error desactivando notificaciones:", error);
+  }
+  return true;
+}
