@@ -79,7 +79,7 @@ async function enableNotifications(button) {
       const token = await messaging.getToken({ serviceWorkerRegistration: registration });
       if (token && hasFirebaseApp() && firebase.database) {
         const user = await ensureNotifAuth();
-        await firebase.database().ref(`notificationTokens/${user.uid}`).set(token);
+        await firebase.database().ref(`tokens_notificaciones/${user.uid}`).set(token);
       }
     } catch (error) {
       console.error("No se pudo obtener el token de notificaciones.", error);
@@ -95,7 +95,7 @@ async function disableNotifications(button) {
   if (hasFirebaseMessaging() && hasFirebaseApp() && firebase.database) {
     try {
       const user = await ensureNotifAuth();
-      await firebase.database().ref(`notificationTokens/${user.uid}`).remove();
+      await firebase.database().ref(`tokens_notificaciones/${user.uid}`).remove();
       const messaging = firebase.messaging();
       const registration = await navigator.serviceWorker.ready;
       const token = await messaging.getToken({ serviceWorkerRegistration: registration }).catch(() => null);
