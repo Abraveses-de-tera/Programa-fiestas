@@ -70,6 +70,16 @@
       </a>
     </section>
 
+    <section class="whatsapp-cta" aria-labelledby="notif-title">
+      <div class="whatsapp-cta-icon" aria-hidden="true">🔔</div>
+      <h2 id="notif-title">Activa los avisos del pueblo</h2>
+      <p>Recibe notificaciones en tu móvil aunque no tengas la web abierta: cambios de horario y avisos de última hora.</p>
+      <button class="whatsapp-cta-button" id="btn-notificaciones" type="button">
+        <span aria-hidden="true">🔔</span>
+        Activar avisos
+      </button>
+    </section>
+
     <footer>
       <p>Programa de fiestas 2027 Abraveses de Tera.</p>
       <p class="footer-note">
@@ -83,6 +93,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey: "AIzaSyAfRHsZtUFClLt5FXKm4ydjsRQVjRM4M2I",
@@ -104,5 +115,6 @@
       });
     }
   </script>
+  <script src="notificaciones.js"></script>
 </body>
 </html>
