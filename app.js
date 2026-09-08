@@ -129,17 +129,74 @@ function linkMarkup(event) {
   return `<a class="event-link" href="${event.link.url}" target="_blank" rel="noopener noreferrer"><span class="event-link-icon">🔗</span>${event.link.label}<span class="event-link-arrow">→</span></a>`;
 }
 
+const EVENT_YEAR = 2026;
+const EVENT_MONTH = 7;
+const UNKNOWN_END_GRACE_MINUTES = 120;
+let eventStatuses = new Map();
+
+function eventStartDate(dayId, time) {
+  const [hours, minutes] = time.split(":").map(Number);
+  return new Date(EVENT_YEAR, EVENT_MONTH, Number(dayId), hours, minutes, 0, 0);
+}
+
+function computeEventStatuses(now) {
+  const flatEvents = [];
+  days.forEach((day) => {
+    day.events.forEach((event) => {
+      const start = eventStartDate(day.id, event.time);
+      flatEvents.push({ event, start });
+    });
+  });
+  flatEvents.sort((a, b) => a.start - b.start);
+
+  flatEvents.forEach((entry, index) => {
+    const next = flatEvents[index + 1];
+    let end = next ? next.start : null;
+    if (!end || end <= entry.start) {
+      end = new Date(entry.start.getTime() + UNKNOWN_END_GRACE_MINUTES * 60 * 1000);
+    }
+    entry.end = end;
+  });
+
+  const statuses = new Map();
+  const upcoming = flatEvents.filter((entry) => entry.start > now);
+  const live = flatEvents.find((entry) => entry.start <= now && now < entry.end);
+
+  if (live) {
+    statuses.set(live.event.eventId, "live");
+  }
+  if (upcoming.length > 0) {
+    const nextEntry = upcoming[0];
+    if (!live || nextEntry.event.eventId !== live.event.eventId) {
+      statuses.set(nextEntry.event.eventId, "next");
+    }
+  }
+  return statuses;
+}
+
+function refreshEventStatuses() {
+  eventStatuses = computeEventStatuses(new Date());
+}
+
 function card(event, color, id) {
   const featuredClass = event.featured ? "event-card--featured" : "";
   const isFavorite = getFavorites()[event.eventId] === true;
+  const status = eventStatuses.get(event.eventId);
+  const liveClass = status === "live" ? " event-card--live" : "";
+  const badgeMarkup = status === "live"
+    ? `<span class="status-badge status-badge--live"><span class="status-dot" aria-hidden="true"></span>En directo ahora</span>`
+    : status === "next"
+      ? `<span class="status-badge status-badge--next">Siguiente actividad</span>`
+      : "";
   return `
-    <article class="event-card ${featuredClass}" style="--accent: var(--${color})">
+    <article class="event-card ${featuredClass}${liveClass}" style="--accent: var(--${color})">
       <div class="event-summary" role="button" tabindex="0" data-event="${id}" aria-expanded="false" aria-controls="details-${id}">
         <time class="event-time">${event.time}</time>
         <span class="event-heading">
           <h3>${event.title}</h3>
           ${event.description ? `<p>${event.description}</p>` : ""}
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
+          ${badgeMarkup}
         </span>
         <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
           ${isFavorite ? "❤️" : "♡"}
@@ -174,6 +231,7 @@ function matchesFilters(event) {
 }
 
 function renderEvents() {
+  refreshEventStatuses();
   const selected = days.find((day) => day.id === selectedId);
   const visible = selected ? [selected] : days;
 
@@ -335,3 +393,18 @@ renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
 ensureAuth().catch(() => {});
+
+setInterval(() => {
+  const previousStatuses = eventStatuses;
+  refreshEventStatuses();
+  let changed = previousStatuses.size !== eventStatuses.size;
+  if (!changed) {
+    for (const [key, value] of eventStatuses) {
+      if (previousStatuses.get(key) !== value) {
+        changed = true;
+        break;
+      }
+    }
+  }
+  if (changed) renderEvents();
+}, 60 * 1000);
