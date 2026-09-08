@@ -98,7 +98,7 @@ function renderFavoritesButton() {
   const count = countFavorites();
   favoritesButton.classList.toggle("is-active", showFavoritesOnly);
   favoritesButton.innerHTML = `
-    <span aria-hidden="true">${showFavoritesOnly ? "❤️" : "🤍"}</span>
+    <span aria-hidden="true">${showFavoritesOnly ? "❤️" : "♡"}</span>
     Mis planes
     ${count > 0 ? `<span class="favorites-count">${count}</span>` : ""}
   `;
@@ -142,7 +142,7 @@ function card(event, color, id) {
           ${event.note ? `<span class="note">${event.note}</span>` : ""}
         </span>
         <button class="favorite-star ${isFavorite ? "is-favorite" : ""}" type="button" data-favorite="${event.eventId}" aria-label="${isFavorite ? "Quitar de mis planes" : "Añadir a mis planes"}" aria-pressed="${isFavorite}">
-          ${isFavorite ? "❤️" : "🤍"}
+          ${isFavorite ? "❤️" : "♡"}
         </button>
         <span class="event-chevron" aria-hidden="true">﹢</span>
       </div>
@@ -198,7 +198,7 @@ function renderEvents() {
   noResults.hidden = totalVisible > 0;
   if (totalVisible === 0) {
     noResults.textContent = showFavoritesOnly
-      ? "Aún no has guardado ninguna actividad. Pulsa el corazón 🤍 de cualquier ficha para añadirla a tus planes."
+      ? "Aún no has guardado ninguna actividad. Pulsa el corazón ♡ de cualquier ficha para añadirla a tus planes."
       : "No hay actividades que coincidan con la búsqueda.";
   }
 }
@@ -254,7 +254,7 @@ eventList.addEventListener("click", (event) => {
     } else {
       const isFavorite = favorites[eventId] === true;
       favoriteButton.classList.toggle("is-favorite", isFavorite);
-      favoriteButton.textContent = isFavorite ? "❤️" : "🤍";
+      favoriteButton.textContent = isFavorite ? "❤️" : "♡";
       favoriteButton.setAttribute("aria-pressed", String(isFavorite));
       favoriteButton.setAttribute("aria-label", isFavorite ? "Quitar de mis planes" : "Añadir a mis planes");
     }
@@ -329,6 +329,8 @@ function listenAttendanceCounts() {
   });
 }
 
+renderTabs();
+renderCategoryFilters();
 renderFavoritesButton();
 renderEvents();
 listenAttendanceCounts();
