@@ -173,13 +173,13 @@
       "color": "green",
       "events": [
         {
-          "eventId": "bendicion-bolas",
+          "eventId": "bendicion-boyas",
           "category": "tradicion",
           "time": "18:30",
-          "title": "Bendición de bolas",
+          "title": "Bendición de boyas",
           "location": "Iglesia de Santiago Apóstol",
           "icon": "🕯️",
-          "photo": "images/bendicion-bolas.jpg",
+          "photo": "images/bendicion-boyas.jpg",
           "detail": "Acto tradicional incluido en el programa festivo. Se recomienda acudir con unos minutos de antelación, mantener un ambiente respetuoso y seguir las indicaciones que se den en el lugar de celebración. Los detalles prácticos, punto de encuentro y posible participación se podrán comunicar por los canales de la organización."
         },
         {

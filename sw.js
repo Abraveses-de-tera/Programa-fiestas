@@ -1,4 +1,4 @@
-const CACHE_NAME = "abraveses-fiestas-v3";
+const CACHE_NAME = "abraveses-fiestas-v4";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -10,7 +10,7 @@ const CORE_ASSETS = [
   "./countdown.js",
   "./manifest.json",
   "./images/abraveses.jpg",
-  "./images/bendicion-bolas.jpg",
+  "./images/bendicion-boyas.jpg",
   "./images/cagada-gallina.jpg",
   "./images/disfraz.jpg",
   "./images/marcha-solidaria.jpg",
