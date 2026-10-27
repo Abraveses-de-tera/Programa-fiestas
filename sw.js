@@ -1,14 +1,21 @@
-const CACHE_NAME = "abraveses-fiestas-v2";
+const CACHE_NAME = "abraveses-fiestas-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
+  "./events.json",
   "./styles.css",
   "./countdown.css",
   "./share.css",
   "./app.js",
   "./countdown.js",
   "./manifest.json",
-  "./images/abraveses.jpg"
+  "./images/abraveses.jpg",
+  "./images/bendicion-bolas.jpg",
+  "./images/cagada-gallina.jpg",
+  "./images/disfraz.jpg",
+  "./images/marcha-solidaria.jpg",
+  "./images/romeria-pendones.jpg",
+  "./images/ruta-bodegas.jpg"
 ];
 
 self.addEventListener("install", (event) => {
