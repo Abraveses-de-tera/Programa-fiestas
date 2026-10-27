@@ -8,7 +8,7 @@ Acceso web: [https://abraveses-de-tera.github.io/Programa-fiestas/](https://abra
 
 ## 🌟 Características
 
-* 📅 **Agenda Interactiva:** Consulta de actividades día a día (del 24 al 30 de agosto) o en vista completa.
+* 📅 **Agenda Interactiva:** Consulta de actividades día a día (del 23 al 29 de agosto) o en vista completa.
 * 🏷️ **Filtros por Categoría:** Música, Gastronomía, Infantil, Tradición, Deporte, Juegos y Ocio.
 * 🔍 **Buscador en tiempo real:** Encuentra cualquier evento al instante por título o descripción.
 * ❤️ **Mis planes (Favoritos):** Guarda tus eventos favoritos para tener tu propio itinerario personalizado.

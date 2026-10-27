@@ -3,12 +3,12 @@ function updateCountdown() {
   if (!el) return;
 
   const now = new Date();
-  const year = (now.getMonth() > 7 || (now.getMonth() === 7 && now.getDate() > 30))
+  const year = (now.getMonth() > 7 || (now.getMonth() === 7 && now.getDate() > 29))
     ? now.getFullYear() + 1
     : now.getFullYear();
 
-  const start = new Date(year, 7, 24, 0, 0, 0, 0);
-  const end = new Date(year, 7, 30, 23, 59, 59, 999);
+  const start = new Date(year, 7, 23, 0, 0, 0, 0);
+  const end = new Date(year, 7, 29, 23, 59, 59, 999);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

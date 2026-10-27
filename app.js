@@ -366,7 +366,7 @@ function renderEvents() {
     ? selected.label
     : showFavoritesOnly
       ? "Mis planes guardados"
-      : `Todos los eventos · del 24 al 30 de agosto de ${EVENT_YEAR}`;
+      : `Todos los eventos · del ${days[0]?.id || "23"} al ${days[days.length - 1]?.id || "29"} de agosto de ${EVENT_YEAR}`;
 
   let totalVisible = 0;
   const html = visible.map((day) => {

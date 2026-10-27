@@ -2,9 +2,9 @@
   "year": 2027,
   "days": [
     {
-      "id": "24",
+      "id": "23",
       "short": "Lun",
-      "label": "Lunes 24 de agosto",
+      "label": "Lunes 23 de agosto",
       "color": "orange",
       "events": [
         {
@@ -20,9 +20,9 @@
       ]
     },
     {
-      "id": "25",
+      "id": "24",
       "short": "Mar",
-      "label": "Martes 25 de agosto",
+      "label": "Martes 24 de agosto",
       "color": "red",
       "events": [
         {
@@ -64,9 +64,9 @@
       ]
     },
     {
-      "id": "26",
+      "id": "25",
       "short": "Mié",
-      "label": "Miércoles 26 de agosto",
+      "label": "Miércoles 25 de agosto",
       "color": "blue",
       "events": [
         {
@@ -115,9 +115,9 @@
       ]
     },
     {
-      "id": "27",
+      "id": "26",
       "short": "Jue",
-      "label": "Jueves 27 de agosto",
+      "label": "Jueves 26 de agosto",
       "color": "yellow",
       "events": [
         {
@@ -167,9 +167,9 @@
       ]
     },
     {
-      "id": "28",
+      "id": "27",
       "short": "Vie",
-      "label": "Viernes 28 de agosto",
+      "label": "Viernes 27 de agosto",
       "color": "green",
       "events": [
         {
@@ -209,9 +209,9 @@
       ]
     },
     {
-      "id": "29",
+      "id": "28",
       "short": "Sáb",
-      "label": "Sábado 29 de agosto",
+      "label": "Sábado 28 de agosto",
       "color": "pink",
       "events": [
         {
@@ -286,9 +286,9 @@
       ]
     },
     {
-      "id": "30",
+      "id": "29",
       "short": "Dom",
-      "label": "Domingo 30 de agosto",
+      "label": "Domingo 29 de agosto",
       "color": "cyan",
       "events": [
         {

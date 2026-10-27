@@ -1,4 +1,4 @@
-const CACHE_NAME = "abraveses-fiestas-v4";
+const CACHE_NAME = "abraveses-fiestas-v5";
 const CORE_ASSETS = [
   "./",
   "./index.html",
