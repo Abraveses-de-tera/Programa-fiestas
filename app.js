@@ -129,7 +129,7 @@ function linkMarkup(event) {
   return `<a class="event-link" href="${event.link.url}" target="_blank" rel="noopener noreferrer"><span class="event-link-icon">🔗</span>${event.link.label}<span class="event-link-arrow">→</span></a>`;
 }
 
-const EVENT_YEAR = 2026;
+const EVENT_YEAR = 2027;
 const EVENT_MONTH = 7;
 const UNKNOWN_END_GRACE_MINUTES = 120;
 let eventStatuses = new Map();

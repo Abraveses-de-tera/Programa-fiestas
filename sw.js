@@ -1,9 +1,12 @@
-const CACHE_NAME = "abraveses-fiestas-v1";
+const CACHE_NAME = "abraveses-fiestas-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
+  "./countdown.css",
+  "./share.css",
   "./app.js",
+  "./countdown.js",
   "./manifest.json",
   "./images/abraveses.jpg"
 ];
